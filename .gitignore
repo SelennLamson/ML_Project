@@ -1,3 +1,7 @@
+# Data folders
+Data/*
+TreatedData/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
