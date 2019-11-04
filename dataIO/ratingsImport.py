@@ -1,12 +1,14 @@
 #-*-coding:Utf-8 -*
-"""Launch this script with a value of "max_users" to continue the import of ratings to the R matrix."""
+"""Launch this script with a start and end offsets to continue the import of ratings to the R matrix."""
 
 import numpy as np
 import os
 import pickle
 
-max_users = 125000
-
+# --------------- IMPORT PARAMETERS ---------------
+start_offset = 1 # start position in the file (in million lines)
+end_offset = 2 # end position in the file (in million lines)
+# -------------------------------------------------
 
 def sorted_search(ar, x, get_closest=False):
 	if len(ar) == 0:
@@ -37,20 +39,37 @@ def sorted_insert(ar, x):
 	return ind
 
 
+def save_results(_data, _users, _animes, _line, _size):
+	np.save(path_ratings, _data)
+	with open(path_users, 'wb') as lf:
+		pickle.dump(_users, lf)
+	with open(path_animes, 'wb') as lf:
+		pickle.dump(_animes, lf)
+	with open(path_info, 'wb') as lf:
+		pickle.dump((_line, _size), lf)
+	print("---------- SAVED RESULTS ----------")
+
+
 data = np.zeros((0, 0), dtype=np.int8)
 
 users = []
 animes = []
 anime_titles = []
 
-path_data = '../Data/UserAnimeList.csv'
-path_users = '../TreatedData/users.pkl'
-path_animes = '../TreatedData/animes.pkl'
-path_ratings = '../TreatedData/ratings.npy'
-path_info = '../TreatedData/info.pkl'
+folder = '../TreatedData/' + str(start_offset) + '_to_' + str(end_offset) + '/'
 
+if not os.path.exists(folder):
+	os.mkdir(folder)
+
+path_data = '../Data/UserAnimeList.csv'
+path_users = folder + 'users.pkl'
+path_animes = folder + 'animes.pkl'
+path_ratings = folder + 'ratings.npy'
+path_info = folder + 'info.pkl'
 accumulated_size = 0
 skip_lines = 0
+start_offset *= 1e6
+end_offset *= 1e6
 
 if os.path.exists(path_users):
 	if os.path.exists(path_animes):
@@ -78,13 +97,18 @@ with open(path_data, "r", encoding="utf8") as file:
 
 	for line in file:
 		line_index += 1
-		if line_index <= skip_lines:
+		if line_index <= start_offset + skip_lines:
 			continue
+		if line_index > end_offset:
+			break
 
 		accumulated_size += len(line)
 		if round(accumulated_size / total_size * 100, 2) > percent:
 			percent = round(accumulated_size / total_size * 100, 2)
-			print("Data import... {}% - line {} - users {} / {}".format(percent, line_index, len(users), max_users))
+			print("Data import... {}% of whole file - line {}/{}".format(
+														percent,
+														round(line_index - start_offset),
+														round(end_offset - start_offset)))
 
 		try:
 			elts = line.split(",")
@@ -108,9 +132,6 @@ with open(path_data, "r", encoding="utf8") as file:
 					data = np.vstack((data, np.zeros((1, len(animes)), dtype=np.int8)))
 				current_user_index = row
 				current_user = username
-				if len(users) == max_users:
-					break
-
 			try:
 				column = sorted_search(animes, anime_id)
 				assert column is not None
@@ -126,13 +147,11 @@ with open(path_data, "r", encoding="utf8") as file:
 		except Exception as e:
 			print("ERROR: Incorrect data point, line " + str(line_index) + ". Didn't stop data import.", e)
 
-print("Finishing importing", len(users), "user scores on", len(animes), "animes.")
-np.save(path_ratings, data)
+		if line_index % 100000 == 0:
+			save_results(data, users, animes, line_index - start_offset, accumulated_size)
 
-with open(path_users, 'wb') as f:
-	pickle.dump(users, f)
-with open(path_animes, 'wb') as f:
-	pickle.dump(animes, f)
-with open(path_info, 'wb') as f:
-	pickle.dump((line_index, accumulated_size), f)
+print("Finishing importing", len(users), "user scores on", len(animes), "animes.")
+print(round(end_offset - start_offset), "million lines imported.")
+
+save_results(data, users, animes, line_index - start_offset, accumulated_size)
 
