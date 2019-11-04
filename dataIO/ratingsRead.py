@@ -17,13 +17,14 @@ series = []
 
 path_users = '../TreatedData/users.pkl'
 path_animes = '../TreatedData/animes.pkl'
-path_ratings = '../TreatedData/ratings.npy'
+path_sparse_ratings = '../TreatedData/sparse_ratings.pkl'
 
 if os.path.exists(path_users):
 	if os.path.exists(path_animes):
-		if os.path.exists(path_ratings):
+		if os.path.exists(path_sparse_ratings):
 			with open(path_users, 'rb') as f:
 				users = pickle.load(f)
 			with open(path_animes, 'rb') as f:
 				series = pickle.load(f)
-			ratings = np.load(path_ratings)
+			with open(path_sparse_ratings, "rb") as f:
+				ratings = pickle.load(f)

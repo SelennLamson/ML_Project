@@ -38,31 +38,12 @@ print(testlist)
 testar(testlist)
 print(testlist)
 
-import pickle
 import numpy as np
 
-# data = data.astype(np.int8)
-# np.save('TreatedData/reduced.npy', data)
+mat = np.zeros((5, 5))
+vec = np.array([1, 2, 3, 4, 5])
+vec = vec.reshape((5, 1))
+print(vec.shape)
+mat = mat - vec
 
-import math
-import matplotlib.pyplot as plt
-
-def prob(x, theta):
-	return 2 * theta * x * math.exp(-theta * x * x)
-
-
-test = "This is a string"
-
-real_theta = 0.1
-estimations = []
-for n in range(1, 10):
-	print(n)
-	probas = [prob(x, real_theta) for x in range(1, n+1)]
-
-	min_prob = min(probas)
-	values = [i for i in range(1, n+1) for n in range(0, round(probas[i-1] // min_prob))]
-
-	estimations.append(len(values) / sum([x**2 for x in values]))
-
-plt.plot(estimations)
-plt.show()
+print(mat)

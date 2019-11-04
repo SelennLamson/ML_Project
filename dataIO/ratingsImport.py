@@ -5,7 +5,7 @@ import numpy as np
 import os
 import pickle
 
-max_users = 25000
+max_users = 125000
 
 
 def sorted_search(ar, x, get_closest=False):
