@@ -21,3 +21,5 @@ with open(path_sparse_ratings, "wb") as file:
 	pickle.dump(sparse_data, file)
 
 print("Terminated.")
+
+#hello
