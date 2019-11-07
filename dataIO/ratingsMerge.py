@@ -49,7 +49,7 @@ def get_coomatrix(A):
                 value.append(A[i][j])
     return row,column,value
 
-base = '../TreatedData/'
+base = '/Users/yimingwu/Documents/GitHub/ML_Project/TreatedData/'
 folders = os.listdir(base)
 folders = [f for f in folders if re.match(r'[0-9]+_to_[0-9]+', f)]
 
@@ -108,24 +108,25 @@ try:
 	# ------------------------ TODO: CODE HERE ------------------------
 	# -----------------------------------------------------------------
     # Merge the ratings2 to rating1
-    username,animeid,rating=get_coomatrix(ratings2)
-    for every_no_zero_rating in range(len(username)):
+    userid,animeid,rating=get_coomatrix(ratings2)
+    for every_no_zero_rating in range(len(userid)):
         fr=0
         fc=0
-        if username[every_no_zero_rating] in users1:
-            fr=users1.index(username[every_no_zero_rating])
-            
+        if users2[userid[every_no_zero_rating]] in users1:
+            fr=users1.index(users2[userid[every_no_zero_rating]])
+            print(users2[userid[every_no_zero_rating]])
+            print(users1[fr])
         else:
-            users1.append(username[every_no_zero_rating])
+            users1.append(users2[userid[every_no_zero_rating]])
             ratings1=np.vstack((ratings1,np.zeros((1,ratings1.shape[1]),dtype=np.int8)))
             fr=ratings1.shape[0]-1
         if animeid[every_no_zero_rating] in animes1:
-            fc=animes1.index(animeid[every_no_zero_rating])-1
+            fc=animes1.index(animeid[every_no_zero_rating])
         else:
             fc=sorted_insert(animes1,animeid[every_no_zero_rating])
             ratings1= np.hstack((ratings1[:, :fc], np.zeros((ratings1.shape[0], 1), dtype=np.int8), ratings1[:,fc:]))    
-        percent=every_no_zero_rating/len(username)
-        if int(percent*100)%10==0:
+        percent=every_no_zero_rating/len(userid)
+        if int(percent*10000)%10==0:
             print(percent*100)
         ratings1[fr][fc]=rating[every_no_zero_rating]        
 #    For each non-zero value in ratings2 : r, c, v
@@ -158,3 +159,5 @@ try:
     print("Data merged successfully. You can safely delete folders: '{}' and '{}'".format(f1, f2))
 except IOError as e:
     print('Error with files:\n', e)
+
+
