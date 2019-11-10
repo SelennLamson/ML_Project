@@ -4,6 +4,7 @@
 import numpy as np
 import os
 import pickle
+from scipy.sparse import csc_matrix
 
 # --------------- IMPORT PARAMETERS ---------------
 start_offset = 1 # start position in the file (in million lines)
@@ -40,7 +41,10 @@ def sorted_insert(ar, x):
 
 
 def save_results(_data, _users, _animes, _line, _size):
-	np.save(path_ratings, _data)
+	_sparse_matrix = csc_matrix(_data, dtype=int)
+
+	with open(path_ratings, "wb") as lf:
+		pickle.dump(_sparse_matrix, lf)
 	with open(path_users, 'wb') as lf:
 		pickle.dump(_users, lf)
 	with open(path_animes, 'wb') as lf:
@@ -81,7 +85,8 @@ if os.path.exists(path_users):
 					users = pickle.load(f)
 				with open(path_animes, 'rb') as f:
 					animes = pickle.load(f)
-				data = np.load(path_ratings)
+				with open(path_ratings, 'rb') as f:
+					data = pickle.load(f).toarray()
 
 
 with open(path_data, "r", encoding="utf8") as file:
