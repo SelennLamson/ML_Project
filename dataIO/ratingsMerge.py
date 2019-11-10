@@ -50,7 +50,8 @@ def get_coomatrix(A):
 				value.append(A[i][j])
 	return row,column,value
 
-base = '/Users/yimingwu/Documents/GitHub/ML_Project/TreatedData/'
+
+base = '../TreatedData/'
 folders = os.listdir(base)
 folders = [f for f in folders if re.match(r'[0-9]+_to_[0-9]+', f)]
 
@@ -106,60 +107,87 @@ try:
 	users2 = pickle.load(open(base + f2 + path_users, 'rb'))
 	animes2 = pickle.load(open(base + f2 + path_animes, 'rb'))
 	ratings2 = pickle.load(open(base + f2 + path_ratings, 'rb'))
-	ratings2 = ratings2.toarray()
-	# -----------------------------------------------------------------
-	# ------------------------ TODO: CODE HERE ------------------------
-	# -----------------------------------------------------------------
-	# Merge the ratings2 to rating1
-	userid,animeid,rating=get_coomatrix(ratings2)
-	for every_no_zero_rating in range(len(userid)):
-		fr=0
-		fc=0
-		if users2[userid[every_no_zero_rating]] in users1:
-			fr=users1.index(users2[userid[every_no_zero_rating]])
-			print(users2[userid[every_no_zero_rating]])
-			print(users1[fr])
+	# We are not converting ratings2 as a dense matrix, we will use it as such
+
+	# Extending ratings1 to contain every new user and anime of ratings2
+	anime_mapping = []	# Index of ratings2's animes in new extended matrix
+	users_mapping = []	# Index of ratings2's users in new extended matrix
+
+	# Adding a new line for each new user, or remembering its index if already there
+	print("\n--- Merging users ---")
+	total_users = len(users2)
+	it = progress = 0
+
+	to_add = 0
+	for user in users2:
+		if user in users1:
+			users_mapping.append(users1.index(user))
 		else:
-			users1.append(users2[userid[every_no_zero_rating]])
-			ratings1=np.vstack((ratings1,np.zeros((1,ratings1.shape[1]),dtype=np.int8)))
-			fr=ratings1.shape[0]-1
-		if animeid[every_no_zero_rating] in animes1:
-			fc=animes1.index(animeid[every_no_zero_rating])
+			users_mapping.append(len(users1))
+			users1.append(user)
+			to_add += 1
+
+		it += 1
+		percent = it / total_users
+		if int(percent * 10) * 10 > progress:
+			progress = round(percent * 10) * 10
+			print('Merging users: {}%'.format(progress))
+
+	ratings1 = np.vstack([ratings1, np.zeros((to_add, len(animes1)))])
+
+	# Inserting a new column at the sorted location if anime unknown, or remembering its index if already there
+	# This part takes into account that animes are always sorted by id, so we can reduce the search field each time
+	print("\n--- Merging animes ---")
+	total_animes = len(animes2)
+	it = progress = 0
+
+	reduced_animes = animes1
+	previous_index = 0
+	for anime in animes2:
+		if anime in reduced_animes:
+			index = sorted_search(reduced_animes, anime) + previous_index
+			anime_mapping.append(index)
+
+			reduced_animes = animes1[index + 1:]
+			previous_index = index + 1
 		else:
-			fc=sorted_insert(animes1,animeid[every_no_zero_rating])
-			ratings1= np.hstack((ratings1[:, :fc], np.zeros((ratings1.shape[0], 1), dtype=np.int8), ratings1[:,fc:]))
-		percent=every_no_zero_rating/len(userid)
-		if int(percent*10000)%10==0:
-			print(percent*100)
-		ratings1[fr][fc]=rating[every_no_zero_rating]
-#    For each non-zero value in ratings2 : r, c, v
-#        username = users2[r]
-#        animeid = animes2[c]
-#        
-#        fr = fc = 0
-#        
-#        if username in users1 --> r1:
-#            fr = r1
-#        else
-#            users1.append(username)
-#            ratings1 --> add row at the end
-#            fr = last row index
-#        
-#        Using sorted_search and sorted_insert
-#        if animeid in animes1 --> c1:
-#            fc = c1
-#        else
-#            fc = sorted_insert(animes1, animeid)
-#            ratings1 --> add column at the inserted index
-#        
-#        ratings[fr, fc] = v
+			new_index = sorted_search(reduced_animes, anime, get_closest=True) + previous_index
+			anime_mapping.append(new_index)
+
+			animes1.insert(new_index, anime)
+			ratings1 = np.hstack([ratings1[:, :new_index], np.zeros((len(users1), 1)), ratings1[:, new_index:]])
+
+			reduced_animes = animes1[new_index + 1:]
+			previous_index = new_index + 1
+
+		it += 1
+		percent = it / total_animes
+		if int(percent * 10) * 10 > progress:
+			progress = round(percent * 10) * 10
+			print('Merging animes: {}%'.format(progress))
+
+	# Merge the values of ratings2 into ratings1, using the sparse matrix representation to have all non-zero values
+	print("\n--- Merging values ---")
+	coomat = ratings2.tocoo()
+	n_values = len(coomat.data)
+	it = progress = 0
+	for row, col, val in zip(coomat.row, coomat.col, coomat.data):
+		new_row = users_mapping[row]
+		new_col = anime_mapping[col]
+		ratings1[new_row, new_col] = val
+
+		it += 1
+		percent = it / n_values
+		if int(percent * 10) * 10 > progress:
+			progress = round(percent * 10) * 10
+			print("Merging values: {}%".format(progress))
 
 	# Saving new data in output folder
 	os.mkdir(base + output)
 	pickle.dump(users1, open(base + output + path_users, 'wb'))
 	pickle.dump(animes1, open(base + output + path_animes, 'wb'))
-	pickle.dump(csc_matrix(ratings1), open(base + output + path_ratings, 'wb'))
-	print("Data merged successfully. You can safely delete folders: '{}' and '{}'".format(f1, f2))
+	pickle.dump(csc_matrix(ratings1, dtype=int), open(base + output + path_ratings, 'wb'))
+	print("Data merged successfully.")
 except IOError as e:
 	print('Error with files:\n', e)
 

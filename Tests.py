@@ -28,7 +28,7 @@ def testar(ar):
 
 
 testlist = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-value = 800
+value = 850
 
 print(testlist)
 print(sorted_search(testlist, value, True))

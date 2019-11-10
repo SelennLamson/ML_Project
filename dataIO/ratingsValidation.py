@@ -5,10 +5,10 @@ import numpy as np
 import os
 import pickle
 
-start_offset = 1
-checks = 1
+start_offset = 0
+checks = 2
 print_errors = False
-base_path = '../TreatedData/1_to_2/'
+base_path = '../TreatedData/0_to_2/'
 
 
 def sorted_search(ar, x, get_closest=False):
@@ -52,15 +52,18 @@ checks = int(checks * 1e6)
 if os.path.exists(path_users):
 	if os.path.exists(path_animes):
 		if os.path.exists(path_ratings):
+			with open(path_users, 'rb') as f:
+				users = pickle.load(f)
+			with open(path_animes, 'rb') as f:
+				animes = pickle.load(f)
+			with open(path_ratings, 'rb') as f:
+				data = pickle.load(f).toarray()
+
 			if os.path.exists(path_info):
 				with open(path_info, 'rb') as f:
 					skip_lines, accumulated_size = pickle.load(f)
-				with open(path_users, 'rb') as f:
-					users = pickle.load(f)
-				with open(path_animes, 'rb') as f:
-					animes = pickle.load(f)
-				with open(path_ratings, 'rb') as f:
-					data = pickle.load(f).toarray()
+			else:
+				skip_lines = checks
 
 with open(path_data, "r", encoding="utf8") as file:
 	file.readline()  # Headers

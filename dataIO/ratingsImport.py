@@ -7,8 +7,8 @@ import pickle
 from scipy.sparse import csc_matrix
 
 # --------------- IMPORT PARAMETERS ---------------
-start_offset = 1 # start position in the file (in million lines)
-end_offset = 2 # end position in the file (in million lines)
+start_offset = 0 # start position in the file (in million lines)
+end_offset = 1 # end position in the file (in million lines)
 # -------------------------------------------------
 
 def sorted_search(ar, x, get_closest=False):
