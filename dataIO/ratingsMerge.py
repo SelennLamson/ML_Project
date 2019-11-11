@@ -102,12 +102,18 @@ try:
 	users1 = pickle.load(open(base + f1 + path_users, 'rb'))
 	animes1 = pickle.load(open(base + f1 + path_animes, 'rb'))
 	ratings1 = pickle.load(open(base + f1 + path_ratings, 'rb'))
-	ratings1 = ratings1.toarray()
 	# Reading folder n°2
 	users2 = pickle.load(open(base + f2 + path_users, 'rb'))
 	animes2 = pickle.load(open(base + f2 + path_animes, 'rb'))
 	ratings2 = pickle.load(open(base + f2 + path_ratings, 'rb'))
 	# We are not converting ratings2 as a dense matrix, we will use it as such
+
+	# Choosing the biggest anime dataset as the base matrix, to avoid wasting time on animes merging (the longest)
+	if len(animes2) > len(animes1):
+		users1, users2 = users2, users1
+		animes1, animes2 = animes2, animes1
+		ratings1, ratings2 = ratings2, ratings1
+	ratings1 = ratings1.toarray()
 
 	# Extending ratings1 to contain every new user and anime of ratings2
 	anime_mapping = []	# Index of ratings2's animes in new extended matrix
@@ -140,31 +146,54 @@ try:
 	print("\n--- Merging animes ---")
 	total_animes = len(animes2)
 	it = progress = 0
-
-	reduced_animes = animes1
-	previous_index = 0
+	current_index = 0
 	for anime in animes2:
-		if anime in reduced_animes:
-			index = sorted_search(reduced_animes, anime) + previous_index
-			anime_mapping.append(index)
-
-			reduced_animes = animes1[index + 1:]
-			previous_index = index + 1
-		else:
-			new_index = sorted_search(reduced_animes, anime, get_closest=True) + previous_index
-			anime_mapping.append(new_index)
-
-			animes1.insert(new_index, anime)
-			ratings1 = np.hstack([ratings1[:, :new_index], np.zeros((len(users1), 1)), ratings1[:, new_index:]])
-
-			reduced_animes = animes1[new_index + 1:]
-			previous_index = new_index + 1
 
 		it += 1
 		percent = it / total_animes
 		if int(percent * 10) * 10 > progress:
 			progress = round(percent * 10) * 10
 			print('Merging animes: {}%'.format(progress))
+
+		while current_index < len(animes1) and animes1[current_index] < anime:
+			current_index += 1
+		if current_index == len(animes1):
+			animes1.append(anime)
+			ratings1 = np.hstack([ratings1, np.zeros((len(users1), 1))])
+			current_index += 1
+		elif animes1[current_index] == anime:
+			anime_mapping.append(current_index)
+		else:
+			animes1.insert(current_index, anime)
+			ratings1 = np.hstack([ratings1[:, :current_index], np.zeros((len(users1), 1)), ratings1[:, current_index:]])
+			anime_mapping.append(current_index)
+		current_index += 1
+
+
+	# reduced_animes = animes1
+	# previous_index = 0
+	# for anime in animes2:
+	# 	if anime in reduced_animes:
+	# 		index = sorted_search(reduced_animes, anime) + previous_index
+	# 		anime_mapping.append(index)
+	#
+	# 		reduced_animes = animes1[index + 1:]
+	# 		previous_index = index + 1
+	# 	else:
+	# 		new_index = sorted_search(reduced_animes, anime, get_closest=True) + previous_index
+	# 		anime_mapping.append(new_index)
+	#
+	# 		animes1.insert(new_index, anime)
+	# 		ratings1 = np.hstack([ratings1[:, :new_index], np.zeros((len(users1), 1)), ratings1[:, new_index:]])
+	#
+	# 		reduced_animes = animes1[new_index + 1:]
+	# 		previous_index = new_index + 1
+	#
+	# 	it += 1
+	# 	percent = it / total_animes
+	# 	if int(percent * 10) * 10 > progress:
+	# 		progress = round(percent * 10) * 10
+	# 		print('Merging animes: {}%'.format(progress))
 
 	# Merge the values of ratings2 into ratings1, using the sparse matrix representation to have all non-zero values
 	print("\n--- Merging values ---")

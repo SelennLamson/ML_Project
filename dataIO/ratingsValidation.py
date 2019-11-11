@@ -5,10 +5,10 @@ import numpy as np
 import os
 import pickle
 
-start_offset = 0
-checks = 2
+start_offset = 60
+checks = 5
 print_errors = False
-base_path = '../TreatedData/0_to_2/'
+base_path = '../TreatedData/60_to_65/'
 
 
 def sorted_search(ar, x, get_closest=False):
