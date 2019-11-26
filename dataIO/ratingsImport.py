@@ -7,8 +7,8 @@ import pickle
 from scipy.sparse import csc_matrix
 
 # --------------- IMPORT PARAMETERS ---------------
-start_offset = 0 # start position in the file (in million lines)
-end_offset = 1 # end position in the file (in million lines)
+start_offset = 80 # start position in the file (in million lines)
+end_offset = 81 # end position in the file (in million lines)
 # -------------------------------------------------
 
 def sorted_search(ar, x, get_closest=False):
@@ -68,7 +68,7 @@ if not os.path.exists(folder):
 path_data = '../Data/UserAnimeList.csv'
 path_users = folder + 'users.pkl'
 path_animes = folder + 'animes.pkl'
-path_ratings = folder + 'ratings.npy'
+path_ratings = folder + 'ratings.pkl'
 path_info = folder + 'info.pkl'
 accumulated_size = 0
 skip_lines = 0

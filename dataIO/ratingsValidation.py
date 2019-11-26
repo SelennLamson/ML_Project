@@ -5,10 +5,10 @@ import numpy as np
 import os
 import pickle
 
-start_offset = 60
-checks = 5
+start_offset = 0
+checks = 81
 print_errors = False
-base_path = '../TreatedData/60_to_65/'
+base_path = '../TreatedData/0_to_81/'
 
 
 def sorted_search(ar, x, get_closest=False):
@@ -43,7 +43,7 @@ anime_titles = []
 path_data = '../Data/UserAnimeList.csv'
 path_users = base_path + 'users.pkl'
 path_animes = base_path + 'animes.pkl'
-path_ratings = base_path + 'ratings.npy'
+path_ratings = base_path + 'ratings.pkl'
 path_info = base_path + 'info.pkl'
 
 start_offset = int(start_offset * 1e6)
@@ -57,7 +57,7 @@ if os.path.exists(path_users):
 			with open(path_animes, 'rb') as f:
 				animes = pickle.load(f)
 			with open(path_ratings, 'rb') as f:
-				data = pickle.load(f).toarray()
+				data = pickle.load(f)
 
 			if os.path.exists(path_info):
 				with open(path_info, 'rb') as f:

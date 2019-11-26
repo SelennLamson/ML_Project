@@ -95,17 +95,17 @@ print("Output folder will be:", output, "\n")
 try:
 	path_users = '/users.pkl'
 	path_animes = '/animes.pkl'
-	path_ratings = '/ratings.npy'
+	path_ratings = '/ratings.pkl'
 	path_info = '/info.pkl'
 
 	# Reading folder n°1
 	users1 = pickle.load(open(base + f1 + path_users, 'rb'))
 	animes1 = pickle.load(open(base + f1 + path_animes, 'rb'))
-	ratings1 = pickle.load(open(base + f1 + path_ratings, 'rb'))
+	ratings1 = pickle.load(open(base + f1 + path_ratings, 'rb')).astype(np.int8)
 	# Reading folder n°2
 	users2 = pickle.load(open(base + f2 + path_users, 'rb'))
 	animes2 = pickle.load(open(base + f2 + path_animes, 'rb'))
-	ratings2 = pickle.load(open(base + f2 + path_ratings, 'rb'))
+	ratings2 = pickle.load(open(base + f2 + path_ratings, 'rb')).astype(np.int8)
 	# We are not converting ratings2 as a dense matrix, we will use it as such
 
 	# Choosing the biggest anime dataset as the base matrix, to avoid wasting time on animes merging (the longest)
@@ -139,7 +139,7 @@ try:
 			progress = round(percent * 10) * 10
 			print('Merging users: {}%'.format(progress))
 
-	ratings1 = np.vstack([ratings1, np.zeros((to_add, len(animes1)))])
+	ratings1 = np.vstack([ratings1, np.zeros((to_add, len(animes1)), dtype=np.int8)])
 
 	# Inserting a new column at the sorted location if anime unknown, or remembering its index if already there
 	# This part takes into account that animes are always sorted by id, so we can reduce the search field each time
@@ -147,6 +147,7 @@ try:
 	total_animes = len(animes2)
 	it = progress = 0
 	current_index = 0
+
 	for anime in animes2:
 
 		it += 1
@@ -157,16 +158,18 @@ try:
 
 		while current_index < len(animes1) and animes1[current_index] < anime:
 			current_index += 1
+
 		if current_index == len(animes1):
 			animes1.append(anime)
-			ratings1 = np.hstack([ratings1, np.zeros((len(users1), 1))])
-			current_index += 1
+			ratings1 = np.hstack([ratings1, np.zeros((len(users1), 1), dtype=np.int8)])
+			anime_mapping.append(current_index)
 		elif animes1[current_index] == anime:
 			anime_mapping.append(current_index)
 		else:
 			animes1.insert(current_index, anime)
-			ratings1 = np.hstack([ratings1[:, :current_index], np.zeros((len(users1), 1)), ratings1[:, current_index:]])
+			ratings1 = np.hstack([ratings1[:, :current_index], np.zeros((len(users1), 1), dtype=np.int8), ratings1[:, current_index:]])
 			anime_mapping.append(current_index)
+
 		current_index += 1
 
 
