@@ -44,7 +44,7 @@ sim = keras.layers.dot([user_vec, series_vec], name='dot-product', axes=1)
 model = keras.models.Model([user_input, series_input], sim)
 
 model.summary()
-model.load_weights('KerasEmbeddingModel/KerasEmbeddingModel')
+model.load_weights('../MatrixFactorization/KerasEmbeddingModel/KerasEmbeddingModel')
 
 model.compile(optimizer=keras.optimizers.Adam(lr=1e-4), loss='mse', metrics=['mae'])
 print(model.layers[2].get_weights()[0].shape)
