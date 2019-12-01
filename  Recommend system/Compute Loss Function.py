@@ -47,17 +47,15 @@ model.summary()
 model.load_weights('../MatrixFactorization/KerasEmbeddingModel/KerasEmbeddingModel')
 
 model.compile(optimizer=keras.optimizers.Adam(lr=1e-4), loss='mse', metrics=['mae'])
-#print(model.layers[2].get_weights()[0].shape)
+print(model.layers[2].get_weights()[0].shape)
 #print(model.layers[3].get_weights()[0].shape)
 #get the matrix after factorization
 ratings2=model.layers[2].get_weights()[0]
 
-# Compute the Predicting Error For recommend system:
-user_test_size = 40
-#randomly choose 40 users to test
+# Compute the RMSE For recommend system:
+user_test_size = 20
+#randomly choose 20 users to test
 random_test_users = rd.sample(users,user_test_size)
-
-
 ERRORLIST=[]
 for users2 in random_test_users:
     ERROR = 0
@@ -67,28 +65,25 @@ for users2 in random_test_users:
     sorted_similaruser=sorted(range(len(users_cosine.T)),key=lambda k:users_cosine.T[k],reverse=True)
     # find the user favorite anime
     user_rating = list(ratings[user_test_id,:])
-    # check if the user is a old user which have given more than 10 animes ratings higher than 8
-    checknewold=[i for i in user_rating if i>8]
-    if len(checknewold)>10:
-        sorted_rating=sorted(range(len(user_rating)),key=lambda k:user_rating[k],reverse=True)
-        #test the 10 highest anime
-        series_test = sorted_rating[:10]
-        # Choose the rating 
-        similaruser_rating=ratings[sorted_similaruser[1:200],:]
-        #Choose the cosine similarity 
-        similaruser_cosine=users_cosine.T[sorted_similaruser[1:200],:]
-        for series in series_test:
-            nozerorating=similaruser_rating[similaruser_rating[:,series]!=0,series]
-            nozerousers_cosine=similaruser_cosine[similaruser_rating[:,series]!=0]
-            if nozerousers_cosine.shape[0]>30:
-                weight=nozerousers_cosine/sum(nozerousers_cosine)       
-                # compute the predicting error
-                predict_ratings=np.dot(weight.T,nozerorating)[0]    
-                real_ratings=ratings[user_test_id][series]
-                print('real score and predict_ratings are  {} and {}'.format(real_ratings,predict_ratings))
-                ERROR += (real_ratings - predict_ratings ) ** 2 
-        ERRORLIST.append(ERROR)  
-#Show the ERROR
-m=[x for x in range(len(ERRORLIST))]
+    sorted_rating=sorted(range(len(user_rating)),key=lambda k:user_rating[k],reverse=True)
+    #test the 10 highest anime
+    series_test = sorted_rating[:10]
+    # Choose the rating 
+    similaruser_rating=ratings[sorted_similaruser[1:200],:]
+    #Choose the cosine similarity 
+    similaruser_cosine=users_cosine.T[sorted_similaruser[1:200],:]
+    for series in series_test:
+        nozerorating=similaruser_rating[similaruser_rating[:,series]!=0,series]
+        nozerousers_cosine=similaruser_cosine[similaruser_rating[:,series]!=0]
+        if nozerousers_cosine.shape[0]>30:
+            weight=nozerousers_cosine/sum(nozerousers_cosine)       
+            # compute the predicting error
+            predict_ratings=np.dot(weight.T,nozerorating)[0]    
+            real_ratings=ratings[user_test_id][series]
+            print('real score and predict_ratings are  {} and {}'.format(real_ratings,predict_ratings))
+            ERROR += (real_ratings - predict_ratings ) ** 2 
+    ERRORLIST.append(ERROR)
+    
+m=[x for x in range(user_test_size)]
 plt.plot(m,ERRORLIST)
-plt.show()
+
