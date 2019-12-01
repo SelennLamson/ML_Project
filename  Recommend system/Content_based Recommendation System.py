@@ -95,8 +95,9 @@ def warmrecommend(user_name):
 def coldrecommend(user_name):
     coldlist=[0 for x in range(Animes_genres.shape[1])]
     print('You are a new user,Please help me understand you ')
+    # get the preference vector of the user
     for i in range(7):
-        print('If you like animes about below, Please choose the order')
+        print('If you like animes about below, Please choose the number')
         print('If finished, input 7' )
         for j in range(6):
             print('{}. {}'.format(j,Animes_genres.columns[6*i+j]))
@@ -108,13 +109,15 @@ def coldrecommend(user_name):
             else:
                 coldlist[6*i+answer]=1
     nps=np.array(coldlist)
+    # Find similar animes based on the genres user like 
     similar_anime_id=neigh.kneighbors(nps.reshape(1,-1),return_distance=False)
+    print ('We found some animes you may like')
     print('Enjoy your animes')
     for index in similar_anime_id:
         print(str(Animes2['title'][index]))
 
 print('Plsase enter your username')
-username=input()
+username = input()
 if username in users:
     warmrecommend(username)
 else :
