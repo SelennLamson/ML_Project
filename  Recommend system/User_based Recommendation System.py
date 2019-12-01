@@ -51,7 +51,7 @@ model.compile(optimizer=keras.optimizers.Adam(lr=1e-4), loss='mse', metrics=['ma
 ratings2=model.layers[2].get_weights()[0]
 
 def recommend_rate(lamda):
-    return 1/(1+math.e**(2/3*lamda+13/30)) # make the similar users between 20 to 10000
+    return 1/(1+math.e**(0.688888888*lamda+2.611111111)) # make the similar users between 20 to 10000
 def recommend_rating(user_name,lamda):
     #compute the cosine similarity
     predict_ratings=[0 for x in range(14480)]
