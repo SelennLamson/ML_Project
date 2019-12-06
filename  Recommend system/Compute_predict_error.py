@@ -77,18 +77,23 @@ for users2 in random_test_users:
         similaruser_rating=ratings[sorted_similaruser[1:200],:]
         #Choose the cosine similarity 
         similaruser_cosine=users_cosine.T[sorted_similaruser[1:200],:]
+        i= 0
         for series in series_test:
             nozerorating=similaruser_rating[similaruser_rating[:,series]!=0,series]
             nozerousers_cosine=similaruser_cosine[similaruser_rating[:,series]!=0]
             if nozerousers_cosine.shape[0]>30:
+                i+=1
                 weight=nozerousers_cosine/sum(nozerousers_cosine)       
                 # compute the predicting error
                 predict_ratings=np.dot(weight.T,nozerorating)[0]    
                 real_ratings=ratings[user_test_id][series]
                 print('real score and predict_ratings are  {} and {}'.format(real_ratings,predict_ratings))
                 ERROR += (real_ratings - predict_ratings ) ** 2 
-        ERRORLIST.append(ERROR)  
+        if ERROR != 0:
+            ERRORLIST.append(ERROR/(i)) 
 #Show the ERROR
 m=[x for x in range(len(ERRORLIST))]
 plt.plot(m,ERRORLIST)
+plt.title("Compute the predict ERROR")
+plt.yticks(np.linspace(0,10,11))
 plt.show()

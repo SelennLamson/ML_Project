@@ -82,7 +82,7 @@ def recommend_rating(user_name,lamda):
     for favorite_anime in sorted_predictrating[:11]:
         favorite_animeid=series[favorite_anime]
         #print('the score is {}'.format(predict_ratings[favorite_anime]))
-        print('We recommend you to watch  {}'.format(animesnames['title_japanese'][favorite_animeid]))
+        print('We recommend you to watch  {}'.format(animesnames['title_english'][favorite_animeid]))
     print('ENJOY YOUR ANIME')
 
 print('Plsase enter your username')
