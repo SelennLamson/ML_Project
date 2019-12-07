@@ -1,0 +1,2 @@
+model_checkpoint_path: "Embedding_D200_RegL2"
+all_model_checkpoint_paths: "Embedding_D200_RegL2"
