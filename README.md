@@ -32,7 +32,7 @@ Python 3.0+
 
 First, you need to clone the project as is from GitHub.
 
-Then you need to download the data archive (~1.7GB zipped, ~10GB unzipped).
+Then you need to download the data archive (~2.5GB zipped, ~15GB unzipped).
 
 Google Drive link to data archive: https://drive.google.com/open?id=1x8cFWxCe26MTnP13UsYfLWPzDWPrKzY_
 
