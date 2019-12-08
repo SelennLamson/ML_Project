@@ -21,16 +21,20 @@ What things you need to have installed
 ```
 Python 3.0+
 	Numpy
+	Pandas
+	Tensorflow (GPU recommended)
+	Sklearn
 	Pickle
+	Matplotlib
 ```
 
 ### Installing
 
 First, you need to clone the project as is from GitHub.
 
-Then you need to download the source data and the treated data (~1.7GB zipped, ~10GB unzipped).
+Then you need to download the data archive (~1.7GB zipped, ~10GB unzipped).
 
-Google Drive link to data archive: https://drive.google.com/open?id=1qt_-5IzO4MU41iV79bjCWu_d7X17H699
+Google Drive link to data archive: https://drive.google.com/open?id=1x8cFWxCe26MTnP13UsYfLWPzDWPrKzY_
 
 Please extract the content of this archive directly inside the project's folder. It is ignored by git.
 
@@ -40,8 +44,6 @@ Please extract the content of this archive directly inside the project's folder.
 * **Thomas Lamson**
 * **Jinshuo Wu**
 * **Yiming Wu**
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
