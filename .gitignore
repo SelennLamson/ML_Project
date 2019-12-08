@@ -112,3 +112,6 @@ proxSeries/trainedModels/svd_1000.npz
 proxSeries/trainedModels/svd_5000.npz
 MatrixFactorization/KerasEmbeddingModel/KerasEmbeddingModel.data-00001-of-00002
 MatrixFactorization/KerasEmbeddingModel/KerasEmbeddingModel.data-00000-of-00002
+MatrixFactorization/Embedding_D200_RegL2/Embedding_D200_RegL2.data-00000-of-00002
+MatrixFactorization/Embedding_D200_RegL2/Embedding_D200_RegL2.data-00001-of-00002
+MatrixFactorization/Embedding_D200_RegL2/Embedding_D200_RegL2.rar

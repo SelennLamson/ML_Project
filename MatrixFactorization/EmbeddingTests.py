@@ -5,7 +5,7 @@ users, series, ratings = read('../TreatedData/0_to_81')
 print("Imported")
 n_series=len(series)
 n_users=len(users)
-
+print(len(ratings.data))
 ratings = np.array(ratings.data)
 print("Arrayed", ratings.shape)
 

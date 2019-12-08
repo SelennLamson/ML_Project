@@ -13,9 +13,9 @@ percent_of_users = 100
 n_latent_factors = 200
 split_test = 0.8
 
-batch_size = 2**14
+batch_size = 2**10
 learning_rate = 1e-4
-epochs = 5
+epochs = 1
 
 users, series, ratings = read('../TreatedData/0_to_81')
 n_series = len(series)
@@ -42,15 +42,15 @@ test = ratings_df[int(split_test*n_ratings):, :]
 print(train.shape, test.shape)
 
 user_input = keras.layers.Input(shape=(1,), name='user_input', dtype='int64')
-user_embedding = keras.layers.Embedding(n_users, n_latent_factors, name='user_embedding', embeddings_regularizer=keras.regularizers.l2(1e-6))(user_input)
+user_embedding = keras.layers.Embedding(n_users, n_latent_factors, name='user_embedding', embeddings_regularizer=keras.regularizers.l2(1e-5))(user_input)
 user_vec = keras.layers.Flatten(name='flat_user')(user_embedding)
 
 series_input = keras.layers.Input(shape=(1,), name='series_input', dtype='int64')
-series_embedding = keras.layers.Embedding(n_series, n_latent_factors, name='series_embedding', embeddings_regularizer=keras.regularizers.l2(1e-6))(series_input)
+series_embedding = keras.layers.Embedding(n_series, n_latent_factors, name='series_embedding', embeddings_regularizer=keras.regularizers.l2(1e-5))(series_input)
 series_vec = keras.layers.Flatten(name='flat_series')(series_embedding)
 
 concat = keras.layers.Concatenate(axis=-1)([user_vec, series_vec])
-sim = keras.layers.Dense(1, name='similarity', kernel_regularizer=keras.regularizers.l2(1e-6))(concat)
+sim = keras.layers.Dense(1, name='similarity', kernel_regularizer=keras.regularizers.l2(1e-5))(concat)
 # sim = keras.layers.Dot([user_vec, series_vec], name='dot-product', axes=1)
 # sim = keras.layers.Dot([user_vec, series_vec], normalize=True, name='cosine_sim', axes=1)
 
